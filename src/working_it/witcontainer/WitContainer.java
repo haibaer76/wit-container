@@ -15,11 +15,14 @@ import java.util.Map;
  * Alle bind-Aufrufe sind nicht thread-sicher, da davon ausgegangen wird,
  * dass das Binden von einen einzelnen Prozess gemacht wird.
  *
- * @author Bernd Ledig, Thorsten Fehre
+ * @author Bernd Ledig, Torsten Fehre
  *
  */
 public class WitContainer {
 	
+	private static final int DEFAULT_INITIAL_CAPACITY = 16;
+
+
 	/**  Map mit den BindObjects   */
 	private final Map<Object, BindObject> bindObjects;
 	
@@ -29,24 +32,33 @@ public class WitContainer {
 	 */
 	private Monitor monitor;
 	
-
+	private final WitContainer parentContainer;
+	
 	/**
 	 * Erzeugt einen IoC-Container mit default Einstellungen
 	 *
 	 */
 	public WitContainer() {
-		super();
-		bindObjects = new HashMap<Object, BindObject>();
+		this(null, DEFAULT_INITIAL_CAPACITY);
 	}
 
+	public WitContainer(WitContainer parentContainer) {
+		this(parentContainer, DEFAULT_INITIAL_CAPACITY);
+	}
+	
+	public WitContainer(int initialCapacity) {
+		this(null, initialCapacity);
+	}
+	
 	/**
 	 * Erzeugt einen IoC-Container
 	 *
 	 * @param initialCapacity Initial-Groesse der internen HashMap fuer Klassen/Instancen
 	 */
-	public WitContainer(int initialCapacity) {
+	public WitContainer(WitContainer parentContainer, int initialCapacity) {
 		super();
 		bindObjects = new HashMap<Object, BindObject>(initialCapacity);
+		this.parentContainer = parentContainer;
 	}
 
 	/**
@@ -113,6 +125,8 @@ public class WitContainer {
 	protected Object getInstance(Object key, int level) {
 		BindObject bindObject = bindObjects.get(key);
 		if(bindObject==null) {
+			if (parentContainer!=null)
+				return parentContainer.getInstance(key, level+1);
 			throw new ServiceNotBoundException(key);
 		}
 		return bindObject.getInstance(level);
