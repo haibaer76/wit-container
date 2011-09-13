@@ -20,7 +20,7 @@ public class ServiceCreationException extends RuntimeException {
 		super("Internal Error in creation of instance "+name.getCanonicalName());
 	}
 
-	public ServiceCreationException(Class clazz, Method method) {
+	public ServiceCreationException(Class<?> clazz, Method method) {
 		super("Internal Error creation of instance "+clazz+" Method "+method.getName()+" expects not one Parameter.");
 	}
 

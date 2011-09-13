@@ -20,7 +20,7 @@ public class BindObject {
 	
 	private final Object key;
 	
-	private Class implClass;
+	private Class<?> implClass;
 	private Object instance;
 	private Object providerKey;
 	
@@ -44,7 +44,7 @@ public class BindObject {
 	}
 
 	
-	public void to(Class implClass) {
+	public void to(Class<?> implClass) {
 		this.implClass = implClass;
 	}
 	
@@ -64,7 +64,7 @@ public class BindObject {
 		}
 		if (providerKey!=null) {
 			// dann ist Instance ein Provider
-			Provider provider = (Provider) instance;
+			Provider<?> provider = (Provider<?>) instance;
 			Object object = provider.get();
 			if(monitor!=null) monitor.log(instance.getClass()+" is a provider, provide: "+object.getClass());
 			return object;
@@ -118,7 +118,7 @@ public class BindObject {
 	 * @throws Exception
 	 */
 	private void injectDependencies(int level) throws Exception {
-		Class clazz = instance.getClass();
+		Class<?> clazz = instance.getClass();
 		for (Method method : clazz.getMethods()) {
 			Inject anno = method.getAnnotation(Inject.class);
 			if (anno==null)
